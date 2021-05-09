@@ -1,7 +1,7 @@
 import machine
 
 
-class accel():
+class MPU6050():
     def __init__(self, i2c, addr=0x68):
         self.iic = i2c
         self.addr = addr
@@ -18,9 +18,9 @@ class accel():
 
     def get_ints(self):
         b = self.get_raw_values()
-        c = []
-        for i in b:
-            c.append(i)
+        c = [i for i in b]
+        #for i in b:
+            #c.append(i)
         return c
 
     def bytes_toint(self, firstbyte, secondbyte):
@@ -32,15 +32,15 @@ class accel():
         raw_ints = self.get_raw_values()
         vals = {}
         if accel:
-            vals["AcX"] = self.bytes_toint(raw_ints[0], raw_ints[1])
-            vals["AcY"] = self.bytes_toint(raw_ints[2], raw_ints[3])
-            vals["AcZ"] = self.bytes_toint(raw_ints[4], raw_ints[5])
+            vals["aX"] = self.bytes_toint(raw_ints[0], raw_ints[1])
+            vals["aY"] = self.bytes_toint(raw_ints[2], raw_ints[3])
+            vals["aZ"] = self.bytes_toint(raw_ints[4], raw_ints[5])
         if temp:
             vals["Tmp"] = self.bytes_toint(raw_ints[6], raw_ints[7]) / 340.00 + 36.53
         if gyro:
-            vals["GyX"] = self.bytes_toint(raw_ints[8], raw_ints[9])
-            vals["GyY"] = self.bytes_toint(raw_ints[10], raw_ints[11])
-            vals["GyZ"] = self.bytes_toint(raw_ints[12], raw_ints[13])
+            vals["gX"] = self.bytes_toint(raw_ints[8], raw_ints[9])
+            vals["gY"] = self.bytes_toint(raw_ints[10], raw_ints[11])
+            vals["gZ"] = self.bytes_toint(raw_ints[12], raw_ints[13])
         self.vals = vals
         return vals  # returned in range of Int16
         # -32768 to 32767
@@ -48,12 +48,12 @@ class accel():
     def get_accel(self):
       _ = self.get_values(gyro=None,temp=None)
       return self.vals
-    #   return {self.vals["AcX"], self.vals["AcY"], self.vals["AcZ"]}
+    #   return {self.vals["aX"], self.vals["aY"], self.vals["aZ"]}
     
     def get_gyro(self):
         _ = self.get_values(accel=None,temp=None)
         return self.vals
-        # return {self.vals['GyX'], self.vals['GyY'], self.vals['GyZ']}
+        # return {self.vals['gX'], self.vals['gY'], self.vals['gZ']}
 
     def get_temp(self):
         _ = self.get_values(accel=None,gyro=None)
@@ -74,12 +74,11 @@ class accel():
             # the threshold. We use abs() so all calculated
             # differences are positive.
             if all(abs(a_val1[key] - a_val2[key]) < threshold for key in a_val1.keys()):
-                self.calibration = a_val1
                 return a_val1  # Calibrated.
     
-    def get_smoothed_values(self, n_samples=20, calibration=None):
+    def get_filtered_values(self, n_samples=20, calibration=None):
         """
-        Get smoothed values from the sensor by sampling
+        Get de-noised values from the sensor by sampling
         the sensor `n_samples` times and returning the mean.
 
         If passed a `calibration` dictionary, subtract these
@@ -95,15 +94,16 @@ class accel():
                 result[key] = result.get(key, 0) + (data[key] / n_samples)
 
         if calibration:
-            # Remove calibration adjustment.
+            # adjust for calibration.
             for key in calibration.keys():
                 result[key] -= calibration[key]
 
         return result
 
-    def val_test(self):  # ONLY FOR TESTING! Also, fast reading sometimes crashes IIC
+    def _val_test(self):  # ONLY FOR TESTING! Also, fast reading sometimes crashes IIC
         from time import sleep
         while 1:
             print(self.get_values())
             sleep(0.05)
+
 
