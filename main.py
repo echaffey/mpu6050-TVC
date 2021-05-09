@@ -8,8 +8,8 @@ class test():
     
     def __init__(self):
         self.i2c = SoftI2C(scl=Pin(22), sda=Pin(21))
-        self.mpu = MPU6050(self.i2c)
-        self.cal_coeff = self.mpu.calibrate(threshold=10)
+        self.imu = MPU6050(self.i2c)
+        self.cal_coeff = self.imu.calibrate(threshold=10)
 
         self.p4 = Pin(18)
         self.p5 = Pin(19)
@@ -37,7 +37,7 @@ class test():
     
     def loop(self):
         for _ in range(1000):
-            pos = self.accel.get_filtered_values(calibration=self.cal_coeff)
+            pos = self.imu.get_filtered_values(calibration=self.cal_coeff)
             ac_x = pos['aX']
             ac_y = pos['aY']
             self.tvc.move(axis=0,duty_value=ac_x)
