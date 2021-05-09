@@ -19,8 +19,6 @@ class MPU6050():
     def get_ints(self):
         b = self.get_raw_values()
         c = [i for i in b]
-        #for i in b:
-            #c.append(i)
         return c
 
     def bytes_toint(self, firstbyte, secondbyte):
@@ -74,6 +72,8 @@ class MPU6050():
             # the threshold. We use abs() so all calculated
             # differences are positive.
             if all(abs(a_val1[key] - a_val2[key]) < threshold for key in a_val1.keys()):
+                print('----------Calibration Complete----------')
+                print(a_val1)
                 return a_val1  # Calibrated.
     
     def get_filtered_values(self, n_samples=20, calibration=None):
