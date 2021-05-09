@@ -9,13 +9,14 @@ class test():
     def __init__(self):
         self.i2c = SoftI2C(scl=Pin(22), sda=Pin(21))
         self.imu = MPU6050(self.i2c)
-        self.cal_coeff = self.imu.calibrate(threshold=10)
+        self.cal_coeff = self.imu.calibrate(threshold=5)
 
         self.p4 = Pin(18)
         self.p5 = Pin(19)
         self.servo = PWM(self.p4, freq=50)
         self.servo2 = PWM(self.p5, freq=50)
         self.tvc = TVC((87,55,110),(87,35,110),(self.servo2,self.servo))
+        self.loop()
         #self.initialize_servo()
     
     def run(self):

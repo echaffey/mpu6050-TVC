@@ -30,7 +30,7 @@ class TVC():
         '''Runs a motion check to the end ranges of each axis motor individually before
         returning them to thier initial states.'''
         
-        for time in list((1.5,0.5)):
+        for time in list((0.5)):
             # Check X range.
             self.MOTOR_X.duty(self.POS_X_MIN)
             sleep(time)
@@ -63,7 +63,7 @@ class TVC():
         '''
         # X axis.
         if axis == 0:
-            pos = self.POS_X_INIT + int(val//10)
+            pos = self.POS_X_INIT + int(val//50)
             if pos > self.POS_X_MAX:
                 return self.POS_X_MAX
             elif pos < self.POS_X_MIN:
@@ -74,7 +74,7 @@ class TVC():
                 return pos
         # Y axis.
         elif axis == 1:
-            pos = self.POS_Y_INIT - int(val//10)
+            pos = self.POS_Y_INIT - int(val//50)
             if pos > self.POS_Y_MAX:
                 return self.POS_Y_MAX
             elif pos < self.POS_Y_MIN:
